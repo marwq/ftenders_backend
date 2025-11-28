@@ -1,0 +1,153 @@
+БИН/ИИН: {{ bin }}
+
+<company_info>
+Название: {{ company.name_ru }}
+{% if company.form %}Форма: {{ company.form }}{% endif %}
+Регион: {{ company.state }}
+Регистрация: {{ company.registration_date }}
+Директор: {{ company.director }}
+
+Адрес:
+  Населенный пункт: {{ company.locality_ru }}
+  Юридический адрес: {{ company.legal_address }}
+
+Деятельность:
+  Основной ОКЕД ({{ company.OKED_main_code }}): {{ company.activity_ru }}
+  {% if company.OKED_addition_codes %}Дополнительные ОКЕД: {{ company.OKED_addition_codes|join(', ') }}{% endif %}
+
+Категории:
+  КРП ({{ company.KRP_code }}): {{ company.KRP_name_ru }}
+  КСЕ ({{ company.KSE_code }}): {{ company.KSE_name_ru }}
+  КФС ({{ company.KFS_code }}): {{ company.KFS_name_ru }}
+  КАТО: {{ company.KATO_code }} - {{ company.KATO_name }}
+
+Сектор: {{ company.sector }}
+Последнее обновление: {{ company.last_update_gov_date }}
+
+Контакты:
+  Email: {{ contacts.email if contacts and contacts.email else 'не найдено' }}
+  Сайт: {{ contacts.website if contacts and contacts.website else 'не найдено' }}
+  Телефоны: {{ contacts.phones|join(', ') if contacts and contacts.phones else 'не найдено' }}
+</company_info>
+
+{% if risks and risks.total_risks > 0 %}
+<risks>
+РИСКИ: Обнаружено {{ risks.total_risks }} риск(ов)
+
+{% if risks.company.courts %}
+Судебные дела компании:
+{% for court in risks.company.courts %}
+  - Суд {{ court.number }}: {{ court.type }} дел(о/а)
+{% endfor %}
+{% endif %}
+
+{% if risks.director.wrong_address %}
+Проблемы с адресом директора:
+{% for item in risks.director.wrong_address %}
+  - БИН: {{ item.bin }}, Директор: {{ item.director }}
+    Номер записи: {{ item.number }}, Дата: {{ item.date }}
+{% endfor %}
+{% endif %}
+
+{% if risks.company.violation %}Нарушения компании: {{ risks.company.violation|length }}{% endif %}
+{% if risks.company.arrears %}Задолженности компании: {{ risks.company.arrears|length }}{% endif %}
+{% if risks.company.bankruptcy %}Банкротство компании: {{ risks.company.bankruptcy|length }}{% endif %}
+{% if risks.company.inactive %}Неактивность компании: {{ risks.company.inactive|length }}{% endif %}
+{% if risks.director.bankruptcy %}Банкротство директора: {{ risks.director.bankruptcy|length }}{% endif %}
+</risks>
+{% endif %}
+
+{% if courts and courts.company %}
+<court_cases>
+СУДЕБНЫЕ ДЕЛА: Найдено {{ courts.company|length }} дел(о/а)
+
+Последние дела(максимум 10):
+{% for case in courts.company[:10] %}
+<case>
+Номер дела: {{ case.number.strip() }}
+Дата: {{ case.date }}
+Тип: {{ case.type }}
+Истец: {{ case.plaintiff }}
+Ответчик: {{ case.defendant }}
+Судья: {{ case.judge.strip() }}
+{% if case.claims %}
+Требования:
+{% for claim in case.claims %}
+  - {{ claim }}
+{% endfor %}
+{% endif %}
+{% if case.results %}
+Результаты:
+{% for result in case.results %}
+  - {{ result }}
+{% endfor %}
+{% endif %}
+{% if case.tsv %}
+Ключевые слова: {{ case.tsv }}
+{% endif %}
+</case>
+
+{% endfor %}
+</court_cases>
+{% endif %}
+
+{% if licenses and licenses.licenses %}
+<licenses>
+ЛИЦЕНЗИИ: Всего {{ licenses.total_count }} лицензий
+
+</licenses>
+{% endif %}
+
+{% if company.zakup %}
+<gos_zakup>
+ГОСЗАКУПКИ
+Регистрационный номер: {{ company.zakup.number_reg }}
+
+Статусы:
+  Резидент: {{ 'Да' if company.zakup.mark_resident else 'Нет' }}
+  Национальная компания: {{ 'Да' if company.zakup.mark_national_company else 'Нет' }}
+  Поставщик: {{ 'Да' if company.zakup.supplier else 'Нет' }}
+  Заказчик: {{ 'Да' if company.zakup.customer else 'Нет' }}
+  Организатор: {{ 'Да' if company.zakup.organizer else 'Нет' }}
+  Государственная монополия: {{ 'Да' if company.zakup.mark_state_monopoly else 'Нет' }}
+
+{% if company.zakup.bank %}
+Банковские счета: {{ company.zakup.bank|length }}
+{% endif %}
+</gos_zakup>
+{% endif %}
+
+{% if company.branches %}
+<branches>
+ФИЛИАЛЫ: {{ company.branches|length }} филиал(ов)
+
+{% for branch in company.branches %}
+  - БИН: {{ branch.bin }}
+    Название: {{ branch.name_ru }}
+    Статус: {{ branch.status }}
+{% endfor %}
+</branches>
+{% endif %}
+
+{% if company.similar %}
+<similar_companies>
+ПОХОЖИЕ КОМПАНИИ
+
+{% if company.similar.by_address and company.similar.by_address.total > 0 %}
+По адресу (всего {{ company.similar.by_address.total_search }}):
+{% for sim in company.similar.by_address.result %}
+  - {{ sim.name_ru }}
+    БИН: {{ sim.bin }}, Директор: {{ sim.director }}
+    Адрес: {{ sim.legal_address }}
+{% endfor %}
+{% endif %}
+
+{% if company.similar.by_director and company.similar.by_director.total > 0 %}
+По директору (всего {{ company.similar.by_director.total_search }}):
+{% for sim in company.similar.by_director.result %}
+  - {{ sim.name_ru }}
+    БИН: {{ sim.bin }}
+{% endfor %}
+{% endif %}
+</similar_companies>
+{% endif %}

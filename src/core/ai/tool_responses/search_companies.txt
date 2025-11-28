@@ -1,0 +1,31 @@
+Найдено компаний: {{ result|length }}
+
+{% for company in result %}
+<company>
+Название: {{ company.get('name_ru') }}
+БИН/ИИН: {{ company.get('bin') }}
+{% if company.get('form') %}Форма: {{ company.get('form') }}{% endif %}
+{% if company.get('state') %}Регион: {{ company.get('state') }}{% endif %}
+
+Регистрация: {{ company.get('registration_date', 'н/д') }}
+Директор: {{ company.get('director', 'н/д') }}
+
+Адрес:
+  Населенный пункт: {{ company.get('locality_ru', 'н/д') }}
+  Юридический адрес: {{ company.get('legal_address', 'не указан') }}
+
+Деятельность:
+  Основной ОКЕД ({{ company.get('OKED_main_code') }}): {{ company.get('activity_ru') }}
+  {% if company.get('OKED_addition_codes') and company.get('OKED_addition_codes')[0] %}Дополнительные ОКЕД: {{ company.get('OKED_addition_codes')|join(', ') }}{% endif %}
+
+Категории:
+  КРП ({{ company.get('KRP_code') }}): {{ company.get('KRP_name_ru', 'н/д') }}
+  КСЕ ({{ company.get('KSE_code') }}): {{ company.get('KSE_name_ru', 'н/д') }}
+  КФС ({{ company.get('KFS_code') }}): {{ company.get('KFS_name_ru', 'н/д') }}
+  {% if company.get('KATO_code') %}КАТО: {{ company.get('KATO_code') }}{% endif %}
+
+{% if company.get('views') %}Просмотров: {{ company.get('views') }}{% endif %}
+Последнее обновление: {{ company.get('last_update_gov_date', 'н/д') }}
+</company>
+
+{% endfor %}

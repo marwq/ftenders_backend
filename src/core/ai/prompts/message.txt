@@ -1,0 +1,49 @@
+{% if mentioned_tenders_contents %}
+<mentioned_tenders_contents>
+
+{% for tender in mentioned_tenders_contents: %}
+<tender>
+{{ tender }}
+</tender>
+{% endfor %}
+
+</mentioned_tenders_contents>
+{% endif %}
+
+{% if mentioned_tenders: %}
+<mentioned_tenders>
+(If you don't have content of mentioned tender, fetch it)
+
+{% for id in mentioned_tenders %}
+- ID: {{ id }}
+{% endfor %}
+
+</mentioned_tenders>
+{% endif %}
+
+{% if mentioned_satu_products: %}
+<mentioned_satu_products>
+
+{% for id in mentioned_satu_products %}
+- Satu product ID: {{ id }}
+{% endfor %}
+
+</mentioned_satu_products>
+{% endif %}
+
+{% if mentioned_file_urls: %}
+<mentioned_file_urls>
+(URLs are from previous context)
+
+{% for url in mentioned_file_urls %}
+- File URL: {{ url }}
+{% endfor %}
+
+</mentioned_file_urls>
+{% endif %}
+
+<user_message (IMPORTANT)>
+
+{{ text }}
+
+</user_message>

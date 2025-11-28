@@ -1,0 +1,46 @@
+ID товара: {{ contacts.data.product.id }}
+
+Компания:
+  ID: {{ contacts.data.product.company.id }}
+  Название: {{ contacts.data.product.company.name }}
+  Слаг: {{ contacts.data.product.company.slug }}
+  {% if contacts.data.product.company.webSiteUrl %}Веб-сайт: {{ contacts.data.product.company.webSiteUrl }}{% endif %}
+
+  Телефоны:
+  {% for phone in contacts.data.product.company.phones %}
+  - {{ phone.number }}
+  {% endfor %}
+
+  Статус:
+    Последняя активность: {{ contacts.data.product.company.lastActivityTime }}
+    Работает: {{ 'Да' if contacts.data.product.company.isOperating else 'Нет' }}
+    Работает прямо сейчас: {{ 'Да' if contacts.data.product.company.isWorkingNow else 'Нет' }}
+
+  {% if contacts.data.product.company.isChatVisible %}Доступен чат: Да{% endif %}
+
+Регионы доставки:
+{% for region in delivery_payment.data.product.company.deliveryRegions %}
+- {{ region.name }}
+  {% if region.subRegions %}
+  {% for subRegion in region.subRegions %}
+  - {{ subRegion.name }}
+    {% if subRegion.subRegions %}
+    {% for subSubRegion in subRegion.subRegions %}
+    - {{ subSubRegion.name }}
+    {% endfor %}
+    {% endif %}
+  {% endfor %}
+  {% endif %}
+{% endfor %}
+
+Способы оплаты:
+{% for payment in delivery_payment.data.product.paymentOptions %}
+- ID: {{ payment.id }}, {{ payment.name }} ({{ payment.raw_type }})
+{% endfor %}
+
+Способы доставки:
+{% for delivery in delivery_payment.data.product.deliveryOptions %}
+- {{ delivery.name }} ({{ delivery.raw_type }})
+  {% if delivery.comment %}Комментарий: {{ delivery.comment }}{% endif %}
+  {% if delivery.available_payment_option_ids %}Доступные способы оплаты: {{ delivery.available_payment_option_ids|join(', ') }}{% endif %}
+{% endfor %}

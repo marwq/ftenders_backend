@@ -1,0 +1,252 @@
+Tender ID: {{ _id }}
+
+<announcement>
+
+ОБЪЯВЛЕНИЕ
+ID: {{ announcement.id }}
+Номер: {{ announcement.announcement_number }}
+Название: {{ announcement.name }}
+Статус: {{ announcement.status.name }} (код: {{ announcement.status.egz_code }})
+Активно: {{ 'Да' if is_active else 'Нет' }}
+Система: {{ announcement.system.name }}
+
+Даты:
+  Опубликовано: {{ announcement.publish_date }}
+  Прием предложений: {{ announcement.offer_start_date }} - {{ announcement.offer_end_date }}
+  {% if announcement.discussion_start_date %}Обсуждение: {{ announcement.discussion_start_date }} - {{ announcement.discussion_end_date }}{% endif %}
+  {% if announcement.repeated_offer_start_date %}Повторный прием: {{ announcement.repeated_offer_start_date }} - {{ announcement.repeated_offer_end_date }}{% endif %}
+  {% if announcement.results_publication_date %}Публикация результатов: {{ announcement.results_publication_date }}{% endif %}
+
+Закупка:
+  Тип: {{ announcement.purchase_type.name }} (код: {{ announcement.purchase_type.egz_code }})
+  Специальный тип: {{ announcement.special_purchase_type if announcement.special_purchase_type else 'н/д' }}
+  Метод: {{ announcement.purchase_method.name }} ({{ announcement.purchase_method.name_kk }})
+  Предмет: {{ announcement.purchase_subject if announcement.purchase_subject else 'н/д' }}
+
+Стоимость: {{ announcement.total_price }} тг
+Количество лотов: {{ announcement.lot_count }}
+
+Особые условия:
+  Среди инвалидов: {{ 'Да' if announcement.is_among_disabled else 'Нет' }}
+  {% if announcement.is_light_industry is not none %}Легкая промышленность: {{ 'Да' if announcement.is_light_industry else 'Нет' }}{% endif %}
+
+{% if announcement.features %}
+Особенности: {{ announcement.features|join(', ') }}
+{% endif %}
+
+ОРГАНИЗАТОР
+БИН: {{ announcement.organizer.iin_bin }}
+Название: {{ announcement.organizer.name }}
+{% if announcement.organizer.short_name %}Краткое название: {{ announcement.organizer.short_name }}{% endif %}
+Резидент: {{ 'Да' if announcement.organizer.is_resident else 'Нет' }}
+{% if announcement.organizer.director %}Директор: {{ announcement.organizer.director }}{% endif %}
+
+Регистрация:
+  Дата: {{ announcement.organizer.registration_date }}
+  {% if announcement.organizer.registration_number %}Номер: {{ announcement.organizer.registration_number }}{% endif %}
+  РНН: {{ announcement.organizer.rnn }}
+  {% if announcement.organizer.okpo %}ОКПО: {{ announcement.organizer.okpo }}{% endif %}
+
+Сертификат:
+  {% if announcement.organizer.certificate_number %}Номер: {{ announcement.organizer.certificate_number }}{% endif %}
+  {% if announcement.organizer.certificate_serial %}Серия: {{ announcement.organizer.certificate_serial }}{% endif %}
+  {% if announcement.organizer.certificate_date %}Дата: {{ announcement.organizer.certificate_date }}{% endif %}
+
+Адрес:
+  Страна: {{ announcement.organizer.address.country.name }}
+  Город: {{ announcement.organizer.address.city }}{% if announcement.organizer.address.zip %}, {{ announcement.organizer.address.zip }}{% endif %}
+  Улица: {{ announcement.organizer.address.street }}, дом {{ announcement.organizer.address.house }}
+  {% if announcement.organizer.address.office %}Офис: {{ announcement.organizer.address.office }}{% endif %}
+  КАТО: {{ announcement.organizer.address.kato.code }} - {{ announcement.organizer.address.kato.full_name }}
+  Телефон: {{ announcement.organizer.address.phone }}
+  {% if announcement.organizer.address.fax %}Факс: {{ announcement.organizer.address.fax }}{% endif %}
+
+Характеристики:
+  {% if announcement.organizer.is_individual_entrepreneur is not none %}ИП: {{ 'Да' if announcement.organizer.is_individual_entrepreneur else 'Нет' }}{% endif %}
+  Субъект малого бизнеса: {{ 'Да' if announcement.organizer.is_small_business_entity else 'Нет' }}
+  {% if announcement.organizer.org_form %}Форма организации: {{ announcement.organizer.org_form }}{% endif %}
+  {% if announcement.organizer.org_legal_form %}Правовая форма: {{ announcement.organizer.org_legal_form }}{% endif %}
+  {% if announcement.organizer.property_form %}Форма собственности: {{ announcement.organizer.property_form }}{% endif %}
+  {% if announcement.organizer.organization_type %}Тип организации: {{ announcement.organizer.organization_type }}{% endif %}
+  Размер: {{ announcement.organizer.size }}
+  {% if announcement.organizer.planned_employees_count is not none and announcement.organizer.planned_employees_count > 0 %}Планируемых сотрудников: {{ announcement.organizer.planned_employees_count }}{% endif %}
+
+{% if announcement.organizer.authorized_capital_amount is not none and announcement.organizer.authorized_capital_amount >= 0 %}
+Уставной капитал:
+  Всего: {{ announcement.organizer.authorized_capital_amount }}
+  {% if announcement.organizer.personal_authorized_capital_amount is not none and announcement.organizer.personal_authorized_capital_amount >= 0 %}Личный: {{ announcement.organizer.personal_authorized_capital_amount }}{% endif %}
+  {% if announcement.organizer.government_authorized_capital_amount is not none and announcement.organizer.government_authorized_capital_amount >= 0 %}Государственный: {{ announcement.organizer.government_authorized_capital_amount }}{% endif %}
+{% endif %}
+
+{% if announcement.organizer.gus %}ГУС: {{ announcement.organizer.gus|join(', ') }}{% endif %}
+{% if announcement.organizer.budget_type %}Тип бюджета: {{ announcement.organizer.budget_type }}{% endif %}
+{% if announcement.organizer.abp %}АБП: {{ announcement.organizer.abp }}{% endif %}
+{% if announcement.organizer.code_gu %}Код ГУ: {{ announcement.organizer.code_gu }}{% endif %}
+
+{% if announcement.customer %}
+ЗАКАЗЧИК
+БИН: {{ announcement.customer.iin_bin }}
+Название: {{ announcement.customer.name }}
+{% if announcement.customer.director %}Директор: {{ announcement.customer.director }}{% endif %}
+{% endif %}
+
+{% if announcement.delivery_address %}
+АДРЕС ДОСТАВКИ
+{{ announcement.delivery_address }}
+{% endif %}
+</announcement>
+
+{% if lots %}
+<lots>
+ЛОТЫ: {{ lots|length }} шт
+
+{% for lot in lots %}
+<lot>
+Номер лота: {{ lot.lot_number }}
+ID: {{ lot.id }}
+{% if lot.name %}Название: {{ lot.name }}{% endif %}
+{% if lot.description %}Описание: {{ lot.description }}{% endif %}
+Статус: {{ lot.status.name }} (код: {{ lot.status.egz_code }})
+Система: {{ lot.system.name }}
+
+Характеристики:
+  Комбинированный: {{ 'Да' if lot.is_combined else 'Нет' }}
+  Демпинг: {{ 'Да' if lot.is_dumping else 'Нет' }}
+  {% if lot.dumping_price %}Демпинговая цена: {{ lot.dumping_price }} тг{% endif %}
+  Консалтинговые услуги: {{ 'Да' if lot.is_consulting_service else 'Нет' }}
+  Удален: {{ 'Да' if lot.is_externally_deleted else 'Нет' }}
+  {% if lot.psd_sign is not none %}Признак ПСД: {{ lot.psd_sign }}{% endif %}
+
+Стоимость: {{ lot.total_price }} тг
+Метод закупки: {{ lot.purchase_method.name }}
+Предмет: {{ lot.purchase_subject.name if lot.purchase_subject and lot.purchase_subject.name else 'н/д' }}
+
+{% if lot.enstru and lot.enstru.name %}
+ЕНСТРУ:
+  Название: {{ lot.enstru.name }}
+  Код: {{ lot.enstru.code }}
+  {% if lot.enstru.short_description %}Описание: {{ lot.enstru.short_description }}{% endif %}
+  КРБС: {{ 'Да' if lot.enstru.is_krbs else 'Нет' }}
+  Для инвалидов: {{ 'Да' if lot.enstru.is_disabled_people else 'Нет' }}
+  СМР: {{ 'Да' if lot.enstru.is_smr else 'Нет' }}
+{% endif %}
+
+Организация лота:
+  БИН: {{ lot.organization.iin_bin }}
+  Название: {{ lot.organization.name }}
+
+{% if lot.plan_items %}
+ПОЗИЦИИ ПЛАНА: {{ lot.plan_items|length }} шт
+
+{% for item in lot.plan_items %}
+<item>
+ID: {{ item.id }}
+Описание: {{ item.description }}
+{% if item.extra_description %}
+Дополнительно: {{ item.extra_description }}
+{% endif %}
+
+Количество: {{ item.count }} {{ item.measure.name if item.measure else '' }}
+{% if item.measure %}(код: {{ item.measure.egz_code }}, альфа-код: {{ item.measure.alpha_code }}){% endif %}
+
+Цены:
+  За единицу: {{ item.unit_price }} тг
+  Общая: {{ item.total_price }} тг
+  Год 1: {{ item.total_price_year_1 }} тг
+  Год 2: {{ item.total_price_year_2 }} тг
+  Год 3: {{ item.total_price_year_3 }} тг
+  Предоплата: {{ item.prepayment }} тг
+
+Статус: {{ item.status.name }}
+Месяц: {{ item.month.name if item.month else 'н/д' }}
+{% if item.decree_date %}Дата декрета: {{ item.decree_date }}{% endif %}
+
+Характеристики:
+  Ограничение закупки: {{ item.purchase_limitation_sign }}
+  Удален: {{ 'Да' if item.is_externally_deleted else 'Нет' }}
+  Активен: {{ 'Да' if item.is_externally_active else 'Нет' }}
+  Квази-сектор: {{ 'Да' if item.is_quasi_sector else 'Нет' }}
+
+{% if item.delivery_deadline_ru %}Срок поставки: {{ item.delivery_deadline_ru }}{% endif %}
+{% if item.delivery_address %}Адрес доставки: {{ item.delivery_address }}{% endif %}
+{% if item.delivery_condition %}Условия доставки: {{ item.delivery_condition }}{% endif %}
+
+{% if item.funding_source %}Источник финансирования: {{ item.funding_source }}{% endif %}
+{% if item.budget_type %}Тип бюджета: {{ item.budget_type }}{% endif %}
+{% if item.extra_info %}Дополнительная информация: {{ item.extra_info }}{% endif %}
+
+{% if item.enstru %}
+ЕНСТРУ:
+  Код: {{ item.enstru.code }}
+  Название: {{ item.enstru.name }}
+{% endif %}
+
+Организация:
+  БИН: {{ item.organization.iin_bin }}
+  Название: {{ item.organization.name }}
+
+{% if item.files %}
+Файлы: {{ item.files|length }} шт
+{% endif %}
+</item>
+
+{% endfor %}
+{% endif %}
+</lot>
+
+{% endfor %}
+</lots>
+{% endif %}
+
+{% if general_files %}
+<files>
+ДОКУМЕНТЫ: {{ general_files|length }} групп(ы)
+
+{% for file_group in general_files %}
+<file_group>
+Группа: {{ file_group.group.name }}
+Категория: {{ file_group.group.category.name }}
+Код группы: {{ file_group.group.egz_code }}
+Обязательно для поставщиков: {{ 'Да' if file_group.is_require_suppliers else 'Нет' }}
+Обязательно для субъектов: {{ 'Да' if file_group.group.is_require_subjects else 'Нет' }}
+Видимо для поставщиков: {{ 'Да' if file_group.group.is_visible_suppliers else 'Нет' }}
+Видимо для субъектов: {{ 'Да' if file_group.group.is_visible_subjects else 'Нет' }}
+{% if file_group.group.template_file %}
+Файл-шаблон: {{ file_group.group.template_file.name }}
+URL шаблона: {{ file_group.group.template_file.file_url }}
+{% endif %}
+
+{% if file_group.files %}
+Файлов: {{ file_group.files|length }}
+{% for file in file_group.files %}
+<file>
+ID: {{ file.id }}
+Название: {{ file.name if file.name else 'н/д' }}
+{% if file.original_name %}Оригинальное название: {{ file.original_name }}{% endif %}
+{% if file.lot_number %}Номер лота: {{ file.lot_number }}{% endif %}
+
+Организатор: {{ file.organizer.name }} (БИН: {{ file.organizer.iin_bin }})
+Категория: {{ file.category.name }}
+Группа: {{ file.group.name }}
+
+Файл:
+  URL: {{ file.file.file_url }}
+  {% if file.file.filename %}Имя файла: {{ file.file.filename }}{% endif %}
+  UUID: {{ file.file.uuid }}
+  Дата загрузки: {{ file.file.timestamp }}
+
+  Статус валидации:
+    Подпись: {{ file.file.validation_status.signature.text }} (проверка: {{ file.file.validation_status.signature.check }})
+    Антивирус: {{ file.file.validation_status.av.text }} (проверка: {{ file.file.validation_status.av.check }})
+    Финальный статус: {{ file.file.validation_status.final }}
+</file>
+
+{% endfor %}
+{% else %}
+Файлов нет (требуется загрузка от поставщика)
+{% endif %}
+</file_group>
+
+{% endfor %}
+</files>
+{% endif %}

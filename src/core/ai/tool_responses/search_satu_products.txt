@@ -1,0 +1,49 @@
+Поисковый запрос: {{ data.listing.searchTerm }}
+{% if data.listing.page.correctedSearchTerm %}Исправленный запрос: {{ data.listing.page.correctedSearchTerm }}{% endif %}
+Найдено товаров: {{ data.listing.page.products|length }}
+
+{% for item in data.listing.page.products %}
+<product>
+ID: {{ item.product.id }}
+Название: {{ item.product.name }}
+{% if item.product.sku %}Артикул: {{ item.product.sku }}{% endif %}
+
+Цена:
+  Текущая цена: {{ item.product.price }} {{ item.product.priceCurrencyLocalized }}{% if item.product.priceFrom %} (от){% endif %}
+  {% if item.product.hasDiscount %}Оригинальная цена: {{ item.product.priceOriginal }} {{ item.product.priceCurrencyLocalized }}{% endif %}
+  {% if item.product.hasDiscount %}Скидочная цена: {{ item.product.discountedPrice }} {{ item.product.priceCurrencyLocalized }}{% endif %}
+  {% if item.product.hasDiscount and item.product.discountDaysLabel %}Скидка: {{ item.product.discountDaysLabel }}{% endif %}
+  Единица измерения: {{ item.product.measureUnit }}
+  {% if item.product.wholesalePrices %}
+  Оптовые цены:
+  {% for wp in item.product.wholesalePrices %}
+    - От {{ wp.minimumOrderQuantity }} {{ item.product.measureUnit }}: {{ wp.price }} {{ item.product.priceCurrencyLocalized }}
+  {% endfor %}
+  {% endif %}
+
+Компания:
+  Название: {{ item.product.company.name }}
+  Регион: {{ item.product.company.regionName }}, {{ item.product.company.countryName }}
+  {% if item.product.company.opinionStats and item.product.company.opinionStats.opinionTotal is not none and item.product.company.opinionStats.opinionTotal > 0 %}Рейтинг: {{ item.product.company.opinionStats.opinionPositivePercent }}% ({{ item.product.company.opinionStats.opinionTotal }} отзыв{% if item.product.company.opinionStats.opinionTotal > 1 %}ов{% endif %}){% endif %}
+  ТОП-сегмент: {{ 'Да' if item.product.company.inTopSegment else 'Нет' }}
+  {% if item.product.company.isChatVisible %}Доступен чат: Да{% endif %}
+
+Наличие:
+  {% if item.product.presence.isAvailable %}Статус: В наличии{% elif item.product.presence.isOrderable %}Статус: Под заказ{% elif item.product.presence.isWait %}Статус: Ожидается{% else %}Статус: {{ item.product.catalogPresence.title }}{% endif %}
+  {% if item.product.presence.isEnding %}Внимание: Заканчивается{% endif %}
+
+{% if item.product.productOpinionCounters and item.product.productOpinionCounters.count is not none and item.product.productOpinionCounters.count > 0 %}
+Отзывы о товаре:
+  Рейтинг: {{ item.product.productOpinionCounters.rating }}
+  Количество отзывов: {{ item.product.productOpinionCounters.count }}
+{% endif %}
+
+{% if item.product.sellingType and item.product.sellingType.universal and item.product.sellingType.universal.title_filter_set %}Тип продажи: {{ item.product.sellingType.universal.title_filter_set }}{% endif %}
+
+{% if item.product.manufacturerInfo %}Производитель: {{ item.product.manufacturerInfo.name }}{% endif %}
+
+Изображение: {{ item.product.imageAlt }}
+URL: {{ item.product.urlText }}
+</product>
+
+{% endfor %}
