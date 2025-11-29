@@ -170,9 +170,6 @@ If you are sure that document is image, put is_image=true, so it would be render
                     'type': 'base64',
                 },
                 'title': filename,
-                'cache_control': {
-                    'type': 'ephemeral',
-                }
             }
             return [pdf_response]
 
@@ -244,9 +241,6 @@ If you are sure that document is image, put is_image=true, so it would be render
                     'media_type': media_type,
                     'type': 'base64',
                 },
-                'cache_control': {
-                    'type': 'ephemeral',
-                }
             }
             return [image_response]
 
