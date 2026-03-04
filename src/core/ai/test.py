@@ -14,7 +14,7 @@ async def main():
         client = await request_container.get(AsyncAnthropic)
 
         runner = client.beta.messages.tool_runner(
-            model='claude-sonnet-4-5',
+            model='claude-sonnet-4-6',
             max_tokens=2048,
             tools=tools,
             betas=['web-fetch-2025-09-10'],
