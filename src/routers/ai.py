@@ -69,6 +69,7 @@ async def ai_websocket(
                 }],
             })
 
+            logger.debug('WS: Sending request to Anthropic')
             runner = client.beta.messages.tool_runner(
                 model='claude-sonnet-4-5',
                 max_tokens=8192,
@@ -79,10 +80,13 @@ async def ai_websocket(
             )
 
             async for message in runner:
+                logger.debug(f'WS: Received message from Anthropic: stop_reason={message.stop_reason}, blocks={len(message.content)}')
                 for block in message.model_dump()['content']:
+                    logger.debug(f'WS: Sending block to client: type={block["type"]}')
                     await ws.send_json(block)
 
             messages = list(runner._params["messages"])
+            logger.debug('WS: Sending end signal to client')
             await ws.send_json({'type': 'end'})
 
             is_first_message = False

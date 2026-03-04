@@ -27,6 +27,8 @@ async def tender_list(
     limit: int = Query(le=100),
     query: str | None = None,
     is_active: bool | None = None,
+    price_from: float | None = None,
+    price_to: float | None = None,
 ):
     projection = {
         'lots': 0,
@@ -37,6 +39,11 @@ async def tender_list(
 
     if query:
         filter_conditions.append({'$text': {'$search': query}})
+
+    if price_from is not None:
+        filter_conditions.append({'announcement.total_price': {'$gte': price_from}})
+    if price_to is not None:
+        filter_conditions.append({'announcement.total_price': {'$lte': price_to}})
 
     if is_active is not None:
         current_timestamp = int(time())
